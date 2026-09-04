@@ -1,0 +1,12 @@
+{{ form_start(form) }}
+    {{ form_errors(form) }}
+
+    {{ form_row(form.username) }}
+    {{ form_row(form.email) }}
+    {{ form_row(form.role) }}
+    {{ form_row(form.plainPassword) }}
+
+    <button class="btn">
+        {{ button_label|default('Enregistrer') }}
+    </button>
+{{ form_end(form) }}

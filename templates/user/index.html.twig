@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Utilisateurs{% endblock %}
+
+{% block body %}
+    <h1>Utilisateurs</h1>
+
+    <a href="{{ path('app_user_new') }}">Ajouter un utilisateur</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom d’utilisateur</th>
+                <th>Adresse e-mail</th>
+                <th>Rôle</th>
+                <th>Informations</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>
+                    <a href="{{ path('app_user_show', {'id': user.id}) }}">
+                        {{ user.username }}
+                    </a>
+                </td>
+
+                <td>{{ user.email }}</td>
+
+                <td>
+                    {% if 'ROLE_ADMIN' in user.roles %}
+                        Administrateur
+                    {% else %}
+                        Utilisateur
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if user.infos %}
+                        Renseignées
+                    {% else %}
+                        Non renseignées
+                    {% endif %}
+                </td>
+
+                <td>
+                    <a href="{{ path('app_user_edit', {'id': user.id}) }}">
+                        Modifier
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">Aucun utilisateur trouvé.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

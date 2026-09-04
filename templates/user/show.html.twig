@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail utilisateur{% endblock %}
+
+{% block body %}
+    <h1>Détail utilisateur</h1>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Nom d’utilisateur</th>
+                <td>{{ user.username }}</td>
+            </tr>
+            <tr>
+                <th>Adresse e-mail</th>
+                <td>{{ user.email }}</td>
+            </tr>
+            <tr>
+                <th>Rôle</th>
+                <td>
+                    {% if 'ROLE_ADMIN' in user.roles %}
+                        Administrateur
+                    {% else %}
+                        Utilisateur
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Informations</th>
+                <td>
+                    {% if user.infos %}
+                        Renseignées
+                    {% else %}
+                        Non renseignées
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_user_index') }}">Retour à la liste</a>
+    <a href="{{ path('app_user_edit', {'id': user.id}) }}">Modifier</a>
+    {{ include('user/_delete_form.html.twig') }}
+{% endblock %}
