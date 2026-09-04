@@ -20,5 +20,25 @@
             Utilisateur
         {% endif %}
     </p>
+    {% if app.user.infos %}
+        <h2>Mes informations</h2>
+
+        <p>
+            <strong>Rang :</strong>
+            {{ app.user.infos.rank }}
+        </p>
+
+        <p>
+            <strong>Victoires :</strong>
+            {{ app.user.infos.victoire }}
+        </p>
+
+        <p>
+            <strong>Défaites :</strong>
+            {{ app.user.infos.defaite }}
+        </p>
+    {% else %}
+        <p>Aucune information disponible pour le moment.</p>
+    {% endif %}
     <a href="{{ path('app_logout') }}">Se déconnecter</a>
 {% endblock %}
