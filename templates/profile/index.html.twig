@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block body %}
+    <h1>Mon profil</h1>
+    <p>
+        <strong>Nom d’utilisateur :</strong>
+        {{ app.user.username }}
+    </p>
+    <p>
+        <strong>Adresse e-mail :</strong>
+        {{ app.user.email }}
+    </p>
+    <p>
+        <strong>Rôle :</strong>
+        {% if 'ROLE_ADMIN' in app.user.roles %}
+            Administrateur
+        {% else %}
+            Utilisateur
+        {% endif %}
+    </p>
+    <a href="{{ path('app_logout') }}">Se déconnecter</a>
+{% endblock %}
