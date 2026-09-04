@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Import CSV{% endblock %}
+
+{% block body %}
+    <h1>Importer des utilisateurs</h1>
+
+    <p>Le fichier CSV doit contenir les colonnes suivantes :</p>
+
+    <p>
+        <strong>
+            username;email;password;roles;rank;victoire;defaite
+        </strong>
+    </p>
+
+    <p>
+        Les colonnes rank, victoire et defaite peuvent être laissées vides
+        si l'utilisateur ne possède pas encore d'informations.
+    </p>
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {{ form_start(form) }}
+        {{ form_row(form.csvFile) }}
+
+        <button type="submit" class="btn">
+            Importer
+        </button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('app_user_index') }}">
+        Retour à la liste des utilisateurs
+    </a>
+{% endblock %}
