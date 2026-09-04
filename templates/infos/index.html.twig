@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Informations utilisateurs{% endblock %}
+
+{% block body %}
+    <h1>Informations utilisateurs</h1>
+
+    <a href="{{ path('app_infos_new') }}">
+        Ajouter des informations
+    </a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Utilisateur</th>
+                <th>Rang</th>
+                <th>Victoires</th>
+                <th>Défaites</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for info in infos %}
+            <tr>
+                <td>
+                    <a href="{{ path('app_user_show', {'id': info.user.id}) }}">
+                        {{ info.user.username }}
+                    </a>
+                </td>
+
+                <td>{{ info.rank }}</td>
+                <td>{{ info.victoire }}</td>
+                <td>{{ info.defaite }}</td>
+
+                <td>
+                    <a href="{{ path('app_infos_show', {'id': info.id}) }}">
+                        Voir
+                    </a>
+
+                    <a href="{{ path('app_infos_edit', {'id': info.id}) }}">
+                        Modifier
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">
+                    Aucune information enregistrée.
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

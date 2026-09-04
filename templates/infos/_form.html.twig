@@ -1,0 +1,15 @@
+{{ form_start(form) }}
+    {{ form_errors(form) }}
+
+    {{ form_row(form.rank) }}
+    {{ form_row(form.victoire) }}
+    {{ form_row(form.defaite) }}
+
+    {% if form.user is defined %}
+        {{ form_row(form.user) }}
+    {% endif %}
+
+    <button class="btn">
+        {{ button_label|default('Enregistrer') }}
+    </button>
+{{ form_end(form) }}
