@@ -3,20 +3,24 @@
 {% block title %}Import CSV{% endblock %}
 
 {% block body %}
-    <h1>Importer des utilisateurs</h1>
+    <div class="page-header">
+        {{ include('_ariane.html.twig', { items: [
+            { label: 'Utilisateurs', url: path('app_user_index') },
+            { label: 'Importer un CSV', url: null }
+        ]}) }}
 
-    <p>Le fichier CSV doit contenir les colonnes suivantes :</p>
+        <h1>Importer des utilisateurs</h1>
 
-    <p>
-        <strong>
-            username;email;password;roles;rank;victoire;defaite
-        </strong>
-    </p>
-
-    <p>
-        Les colonnes rank, victoire et defaite peuvent être laissées vides
-        si l'utilisateur ne possède pas encore d'informations.
-    </p>
+        {% if previewRows is null %}
+            <p>
+                Sélectionnez un fichier CSV pour vérifier son contenu avant l'import.
+            </p>
+        {% else %}
+            <p>
+                Vérifiez les utilisateurs détectés avant de confirmer l'import.
+            </p>
+        {% endif %}
+    </div>
 
     {% for message in app.flashes('error') %}
         <div class="alert alert-danger">
@@ -24,15 +28,276 @@
         </div>
     {% endfor %}
 
-    {{ form_start(form) }}
-        {{ form_row(form.csvFile) }}
+    {# ÉTAPE 1 : sélection du fichier #}
+    {% if previewRows is null %}
+        <div class="card card-form csv-upload-card">
+            {{ form_start(form, {
+                attr: {
+                    class: 'admin-form',
+                    'data-turbo': 'false'
+                }
+            }) }}
 
-        <button type="submit" class="btn">
-            Importer
-        </button>
-    {{ form_end(form) }}
+                <div class="form-group">
+                    {{ form_label(form.csvFile) }}
+                    {{ form_widget(form.csvFile) }}
+                    {{ form_errors(form.csvFile) }}
+                </div>
 
-    <a href="{{ path('app_user_index') }}">
-        Retour à la liste des utilisateurs
-    </a>
+                <div class="csv-format">
+                    <p>
+                        <strong>Format attendu</strong>
+                    </p>
+
+                    <code>
+                        username;email;password;roles;rank;victoire;defaite
+                    </code>
+
+                    <p class="form-help">
+                        Les colonnes rank, victoire et defaite peuvent toutes les trois
+                        être laissées vides.
+                    </p>
+                </div>
+
+                <div class="form-actions">
+                    <a
+                        href="{{ path('app_user_index') }}"
+                        class="btn btn-outline"
+                    >
+                        Annuler
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Prévisualiser
+                    </button>
+                </div>
+
+            {{ form_end(form) }}
+        </div>
+    {% endif %}
+
+
+    {# ÉTAPE 2 : prévisualisation #}
+    {% if previewRows is not null %}
+        {% set validCount = 0 %}
+        {% set invalidCount = 0 %}
+
+        {% for row in previewRows %}
+            {% if row.valid %}
+                {% set validCount = validCount + 1 %}
+            {% else %}
+                {% set invalidCount = invalidCount + 1 %}
+            {% endif %}
+        {% endfor %}
+
+        <div class="csv-file-card card">
+            <div>
+                <span class="csv-file-label">
+                    Fichier analysé
+                </span>
+
+                <strong class="csv-file-name">
+                    {{ fileName }}
+                </strong>
+            </div>
+
+            <a
+                href="{{ path('app_csv_import') }}"
+                class="btn btn-outline"
+            >
+                Changer de fichier
+            </a>
+        </div>
+
+
+        <section class="csv-preview">
+            <div class="csv-preview-header">
+                <div>
+                    <h2>Prévisualisation</h2>
+
+                    <p>
+                        Vérifiez les données détectées dans le fichier.
+                    </p>
+                </div>
+
+                <div class="csv-preview-summary">
+                    <span class="csv-count csv-count-success">
+                        {{ validCount }} valide(s)
+                    </span>
+
+                    {% if invalidCount > 0 %}
+                        <span class="csv-count csv-count-error">
+                            {{ invalidCount }} invalide(s)
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            <form
+                method="post"
+                action="{{ path('app_csv_import_confirm') }}"
+                class="csv-confirm-form"
+                data-turbo="false"
+            >
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="{{ csrf_token('csv_import_confirm') }}"
+                >
+            <div class="table-wrapper">
+                <table class="table admin-table csv-preview-table">
+                    <thead>
+                        <tr>                    
+                            <th>
+                                <input
+                                    type="checkbox"
+                                    id="csv-select-all"
+                                    checked
+                                    aria-label="Tout sélectionner"
+                                >
+                            </th>
+                            <th>Nom d'utilisateur</th>
+                            <th>E-mail</th>
+                            <th>Rôle</th>
+                            <th>Rang</th>
+                            <th>Victoires</th>
+                            <th>Défaites</th>
+                            <th>État</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for row in previewRows %}
+                            <tr class="{{ row.valid ? '' : 'csv-row-invalid' }}">
+                                <td>
+                                    {% if row.valid %}
+                                        <input
+                                            type="checkbox"
+                                            class="csv-row-checkbox"
+                                            name="selectedUsernames[]"
+                                            value="{{ row.username }}"
+                                            checked
+                                            aria-label="Sélectionner {{ row.username }}"
+                                        >
+                                    {% else %}
+                                        <input
+                                            type="checkbox"
+                                            disabled
+                                            aria-label="Utilisateur invalide"
+                                        >
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ row.username != '' ? row.username : '—' }}
+                                </td>
+
+                                <td>
+                                    {{ row.email != '' ? row.email : '—' }}
+                                </td>
+
+                                <td>
+                                    {% if row.role == 'ROLE_ADMIN' %}
+                                        Administrateur
+                                    {% elseif row.role == 'ROLE_USER' %}
+                                        Utilisateur
+                                    {% else %}
+                                        {{ row.role != '' ? row.role : '—' }}
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {{ row.rank != '' ? row.rank : '—' }}
+                                </td>
+
+                                <td>
+                                    {{ row.victoire != '' ? row.victoire : '—' }}
+                                </td>
+
+                                <td>
+                                    {{ row.defaite != '' ? row.defaite : '—' }}
+                                </td>
+
+                                <td>
+                                    {% if row.valid %}
+                                        <span class="status status-success">
+                                            Valide
+                                        </span>
+                                    {% else %}
+                                        <div class="csv-error">
+                                            <span class="status status-error">
+                                                Invalide
+                                            </span>
+
+                                            <span class="csv-error-message">
+                                                Ligne {{ row.line }} · {{ row.error }}
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="csv-preview-actions">
+                <a
+                    href="{{ path('app_csv_import') }}"
+                    class="btn btn-outline"
+                >
+                    Changer de fichier
+                </a>
+
+                {% if validCount > 0 %}
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        id="csv-import-button"
+                    >
+                        Importer {{ validCount }} utilisateur(s)
+                    </button>
+                {% endif %}
+            </div>
+            </form>
+        </section>
+    {% endif %}
+
+    <script>
+        const selectAll = document.getElementById('csv-select-all');
+        const checkboxes = document.querySelectorAll('.csv-row-checkbox');
+        const importButton = document.getElementById('csv-import-button');
+
+        if (selectAll && importButton) {
+            const updateButton = () => {
+                const selectedCount = document.querySelectorAll(
+                    '.csv-row-checkbox:checked'
+                ).length;
+
+                importButton.textContent =
+                    `Importer ${selectedCount} utilisateur(s)`;
+
+                importButton.disabled = selectedCount === 0;
+
+                selectAll.checked =
+                    selectedCount === checkboxes.length;
+
+                selectAll.indeterminate =
+                    selectedCount > 0
+                    && selectedCount < checkboxes.length;
+            };
+
+            selectAll.addEventListener('change', () => {
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = selectAll.checked;
+                });
+
+                updateButton();
+            });
+
+            checkboxes.forEach((checkbox) => {
+                checkbox.addEventListener('change', updateButton);
+            });
+
+            updateButton();
+        }
+    </script>
 {% endblock %}

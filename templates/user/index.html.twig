@@ -3,59 +3,89 @@
 {% block title %}Utilisateurs{% endblock %}
 
 {% block body %}
-    <h1>Utilisateurs</h1>
+    <div class="page-header page-header-with-actions">
+        <div>
+            <h1>Utilisateurs</h1>
+            <p>Gérez les comptes utilisateurs et leurs informations.</p>
+        </div>
 
-    <a href="{{ path('app_user_new') }}">Ajouter un utilisateur</a>
+        <div class="page-actions">
+            <a href="{{ path('app_user_new') }}" class="btn btn-outline">
+                + Ajouter un utilisateur
+            </a>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nom d’utilisateur</th>
-                <th>Adresse e-mail</th>
-                <th>Rôle</th>
-                <th>Informations</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+            <a href="{{ path('app_csv_import') }}" class="btn btn-primary">
+                Importer un CSV
+            </a>
+        </div>
+    </div>
 
-        <tbody>
-        {% for user in users %}
-            <tr>
-                <td>
-                    <a href="{{ path('app_user_show', {'id': user.id}) }}">
-                        {{ user.username }}
-                    </a>
-                </td>
+    <div class="card table-wrapper">
+        <table class="table admin-table">
+            <thead>
+                <tr>
+                    <th>Nom d’utilisateur</th>
+                    <th>E-mail</th>
+                    <th>Rôle</th>
+                    <th>Infos</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
 
-                <td>{{ user.email }}</td>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>
+                            <a
+                                href="{{ path('app_user_show', {'id': user.id}) }}"
+                                class="table-link"
+                            >
+                                {{ user.username }}
+                            </a>
+                        </td>
 
-                <td>
-                    {% if 'ROLE_ADMIN' in user.roles %}
-                        Administrateur
-                    {% else %}
-                        Utilisateur
-                    {% endif %}
-                </td>
+                        <td>{{ user.email }}</td>
 
-                <td>
-                    {% if user.infos %}
-                        Renseignées
-                    {% else %}
-                        Non renseignées
-                    {% endif %}
-                </td>
+                        <td>
+                            {{ 'ROLE_ADMIN' in user.roles
+                                ? 'Administrateur'
+                                : 'Utilisateur'
+                            }}
+                        </td>
 
-                <td>
-                    <a href="{{ path('app_user_edit', {'id': user.id}) }}">
-                        Modifier
-                    </a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">Aucun utilisateur trouvé.</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                        <td>
+                            {% if user.infos %}
+                                <span class="status status-success">
+                                    Complètes
+                                </span>
+                            {% elseif 'ROLE_ADMIN' in user.roles %}
+                                <span class="status status-neutral">
+                                    —
+                                </span>
+                            {% else %}
+                                <span class="status status-warning">
+                                    À compléter
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a
+                                href="{{ path('app_user_edit', {'id': user.id}) }}"
+                                class="table-action"
+                            >
+                                Modifier
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="table-empty">
+                            Aucun utilisateur enregistré.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

@@ -1,15 +1,32 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ajouter des informations{% endblock %}
+{% block title %}Ajouter les informations{% endblock %}
 
 {% block body %}
-    <h1>Ajouter des informations</h1>
+    <div class="form-page">
+        <div class="page-header">
+            {% if info.user %}
+                {{ include('_ariane.html.twig', { items: [
+                    { label: 'Utilisateurs',              url: path('app_user_index') },
+                    { label: info.user.username,          url: path('app_user_show', {id: info.user.id}) },
+                    { label: 'Ajouter les informations',  url: null }
+                ]}) }}
+            {% else %}
+                {{ include('_ariane.html.twig', { items: [
+                    { label: 'Utilisateurs',              url: path('app_user_index') },
+                    { label: 'Ajouter les informations',  url: null }
+                ]}) }}
+            {% endif %}
 
-    {{ include('infos/_form.html.twig', {
-        'button_label': 'Ajouter'
-    }) }}
+            <h1>Ajouter les informations</h1>
+            <p>Ajoutez les informations liées à cet utilisateur.</p>
+        </div>
 
-    <a href="{{ path('app_infos_index') }}">
-        Retour à la liste
-    </a>
+        {{ include('infos/_form.html.twig', {
+            button_label: 'Ajouter les informations',
+            cancel_path: info.user
+                ? path('app_user_show', {'id': info.user.id})
+                : path('app_user_index')
+        }) }}
+    </div>
 {% endblock %}

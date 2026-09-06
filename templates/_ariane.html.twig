@@ -1,0 +1,10 @@
+<nav class="ariane">
+    {% for item in items %}
+        {% if not loop.last %}
+            <a href="{{ item.url }}" class="ariane-lien">{{ item.label }}</a>
+            <span class="ariane-sep">›</span>
+        {% else %}
+            <span class="ariane-actuel">{{ item.label }}</span>
+        {% endif %}
+    {% endfor %}
+</nav>

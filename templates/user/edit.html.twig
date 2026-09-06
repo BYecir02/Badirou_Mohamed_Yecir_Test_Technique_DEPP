@@ -1,13 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit User{% endblock %}
+{% block title %}Modifier l’utilisateur{% endblock %}
 
 {% block body %}
-    <h1>Edit User</h1>
+    <div class="form-page">
+        <div class="page-header">
+            {{ include('_ariane.html.twig', { items: [
+                { label: 'Utilisateurs',   url: path('app_user_index') },
+                { label: user.username,    url: path('app_user_show', {id: user.id}) },
+                { label: 'Modifier',       url: null }
+            ]}) }}
 
-    {{ include('user/_form.html.twig', {'button_label': 'Update'}) }}
+            <h1>Modifier l’utilisateur</h1>
+            <p>Mettez à jour les informations du compte.</p>
+        </div>
 
-    <a href="{{ path('app_user_index') }}">back to list</a>
-
-    {{ include('user/_delete_form.html.twig') }}
+        {{ include('user/_form.html.twig', {
+            button_label: 'Enregistrer les modifications',
+            password_required: false,
+            cancel_path: path('app_user_show', {'id': user.id})
+        }) }}
+    </div>
 {% endblock %}

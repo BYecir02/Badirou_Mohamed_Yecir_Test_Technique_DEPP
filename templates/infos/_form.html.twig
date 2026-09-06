@@ -1,15 +1,57 @@
-{{ form_start(form) }}
-    {{ form_errors(form) }}
+{{ form_start(form, {
+    attr: {
+        class: 'admin-form'
+    }
+}) }}
 
-    {{ form_row(form.rank) }}
-    {{ form_row(form.victoire) }}
-    {{ form_row(form.defaite) }}
+    <div class="card card-form">
+        <div class="form-group">
+            {{ form_label(form.rank) }}
+            {{ form_widget(form.rank, {
+                attr: {
+                    placeholder: 'Entrez le rang'
+                }
+            }) }}
+            {{ form_errors(form.rank) }}
+        </div>
 
-    {% if form.user is defined %}
-        {{ form_row(form.user) }}
-    {% endif %}
+        <div class="form-group">
+            {{ form_label(form.victoire) }}
+            {{ form_widget(form.victoire, {
+                attr: {
+                    placeholder: 'Entrez le nombre de victoires'
+                }
+            }) }}
+            {{ form_errors(form.victoire) }}
+        </div>
 
-    <button class="btn">
-        {{ button_label|default('Enregistrer') }}
-    </button>
+        <div class="form-group">
+            {{ form_label(form.defaite) }}
+            {{ form_widget(form.defaite, {
+                attr: {
+                    placeholder: 'Entrez le nombre de défaites'
+                }
+            }) }}
+            {{ form_errors(form.defaite) }}
+        </div>
+
+        {% if form.user is defined %}
+            <div class="form-group">
+                {{ form_label(form.user) }}
+                {{ form_widget(form.user) }}
+                {{ form_errors(form.user) }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="form-actions">
+        <a href="{{ cancel_path }}" class="btn btn-outline">
+            Annuler
+        </a>
+
+        <button type="submit" class="btn btn-primary">
+            {{ button_label }}
+        </button>
+    </div>
+
 {{ form_end(form) }}

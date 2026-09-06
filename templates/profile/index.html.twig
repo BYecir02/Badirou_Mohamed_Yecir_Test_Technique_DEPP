@@ -3,42 +3,56 @@
 {% block title %}Mon profil{% endblock %}
 
 {% block body %}
-    <h1>Mon profil</h1>
-    <p>
-        <strong>Nom d’utilisateur :</strong>
-        {{ app.user.username }}
-    </p>
-    <p>
-        <strong>Adresse e-mail :</strong>
-        {{ app.user.email }}
-    </p>
-    <p>
-        <strong>Rôle :</strong>
-        {% if 'ROLE_ADMIN' in app.user.roles %}
-            Administrateur
+    <div class="page-header">
+        <h1>Mon profil</h1>
+        <p>Consultez les informations associées à votre compte.</p>
+    </div>
+
+    <section class="card card-profile">
+        <h2>Informations du profil</h2>
+
+        <div class="info-row">
+            <span class="info-label">Nom d’utilisateur</span>
+            <span class="info-value">{{ app.user.username }}</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">E-mail</span>
+            <span class="info-value">{{ app.user.email }}</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Rôle</span>
+            <span class="info-value">
+                {{ is_granted('ROLE_ADMIN') ? 'Administrateur' : 'Utilisateur' }}
+            </span>
+        </div>
+
+        {% if app.user.infos %}
+            <div class="info-row">
+                <span class="info-label">Rang</span>
+                <span class="info-value value-rank">
+                    {{ app.user.infos.rank }}
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Victoires</span>
+                <span class="info-value value-win">
+                    {{ app.user.infos.victoire }}
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Défaites</span>
+                <span class="info-value value-loss">
+                    {{ app.user.infos.defaite }}
+                </span>
+            </div>
         {% else %}
-            Utilisateur
+            <div class="profile-empty">
+                Aucune information complémentaire disponible pour le moment.
+            </div>
         {% endif %}
-    </p>
-    {% if app.user.infos %}
-        <h2>Mes informations</h2>
-
-        <p>
-            <strong>Rang :</strong>
-            {{ app.user.infos.rank }}
-        </p>
-
-        <p>
-            <strong>Victoires :</strong>
-            {{ app.user.infos.victoire }}
-        </p>
-
-        <p>
-            <strong>Défaites :</strong>
-            {{ app.user.infos.defaite }}
-        </p>
-    {% else %}
-        <p>Aucune information disponible pour le moment.</p>
-    {% endif %}
-    <a href="{{ path('app_logout') }}">Se déconnecter</a>
+    </section>
 {% endblock %}

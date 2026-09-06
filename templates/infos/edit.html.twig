@@ -3,15 +3,21 @@
 {% block title %}Modifier les informations{% endblock %}
 
 {% block body %}
-    <h1>Modifier les informations</h1>
+    <div class="form-page">
+        <div class="page-header">
+            {{ include('_ariane.html.twig', { items: [
+                { label: 'Utilisateurs',             url: path('app_user_index') },
+                { label: info.user.username,         url: path('app_user_show', {id: info.user.id}) },
+                { label: 'Modifier les informations', url: null }
+            ]}) }}
 
-    {{ include('infos/_form.html.twig', {
-        'button_label': 'Enregistrer'
-    }) }}
+            <h1>Modifier les informations</h1>
+            <p>Mettez à jour les informations de cet utilisateur.</p>
+        </div>
 
-    <a href="{{ path('app_infos_index') }}">
-        Retour à la liste
-    </a>
-
-    {{ include('infos/_delete_form.html.twig') }}
+        {{ include('infos/_form.html.twig', {
+            button_label: 'Enregistrer les modifications',
+            cancel_path: path('app_user_show', {'id': info.user.id})
+        }) }}
+    </div>
 {% endblock %}

@@ -3,13 +3,21 @@
 {% block title %}Ajouter un utilisateur{% endblock %}
 
 {% block body %}
-    <h1>Ajouter un utilisateur</h1>
+    <div class="form-page">
+        <div class="page-header">
+            {{ include('_ariane.html.twig', { items: [
+                { label: 'Utilisateurs',        url: path('app_user_index') },
+                { label: 'Ajouter un utilisateur', url: null }
+            ]}) }}
 
-    {{ include('user/_form.html.twig', {
-        'button_label': 'Ajouter'
-    }) }}
+            <h1>Ajouter un utilisateur</h1>
+            <p>Créez un nouveau compte utilisateur.</p>
+        </div>
 
-    <a href="{{ path('app_user_index') }}">
-        Retour à la liste
-    </a>
+        {{ include('user/_form.html.twig', {
+            button_label: 'Créer l’utilisateur',
+            password_required: true,
+            cancel_path: path('app_user_index')
+        }) }}
+    </div>
 {% endblock %}

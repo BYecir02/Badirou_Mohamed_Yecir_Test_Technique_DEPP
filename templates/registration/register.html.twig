@@ -1,19 +1,66 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Créer un compte{% endblock %}
+
+{% block body_class %}auth-body{% endblock %}
 
 {% block body %}
-    <h1>Créer un compte</h1>
+    <div class="auth-page">
+        <div class="card card-auth">
+            <div class="auth-header">
+                <h1>Créer un compte</h1>
+                <p>Renseignez vos informations pour vous inscrire</p>
+            </div>
 
-    {{ form_errors(registrationForm) }}
+            {{ form_start(registrationForm, {
+                attr: {
+                    class: 'auth-form'
+                }
+            }) }}
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.username) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Mot de passe'
-        }) }}
+                <div class="form-group">
+                    {{ form_label(registrationForm.username) }}
+                    {{ form_widget(registrationForm.username, {
+                        attr: {
+                            placeholder: 'Choisissez un nom d’utilisateur',
+                            autocomplete: 'username'
+                        }
+                    }) }}
+                    {{ form_errors(registrationForm.username) }}
+                </div>
 
-        <button type="submit" class="btn">S'inscrire</button>
-    {{ form_end(registrationForm) }}
+                <div class="form-group">
+                    {{ form_label(registrationForm.email) }}
+                    {{ form_widget(registrationForm.email, {
+                        attr: {
+                            placeholder: 'Entrez votre adresse e-mail',
+                            autocomplete: 'email'
+                        }
+                    }) }}
+                    {{ form_errors(registrationForm.email) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(registrationForm.plainPassword) }}
+                    {{ form_widget(registrationForm.plainPassword, {
+                        attr: {
+                            placeholder: 'Choisissez un mot de passe',
+                            autocomplete: 'new-password'
+                        }
+                    }) }}
+                    {{ form_errors(registrationForm.plainPassword) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary auth-submit">
+                    Créer le compte
+                </button>
+
+            {{ form_end(registrationForm) }}
+
+            <p class="auth-footer">
+                Vous avez déjà un compte ?
+                <a href="{{ path('app_login') }}">Se connecter</a>
+            </p>
+        </div>
+    </div>
 {% endblock %}

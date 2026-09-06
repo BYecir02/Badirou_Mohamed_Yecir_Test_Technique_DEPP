@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\UserRepository;
 
 #[Route('/admin/informations')]
 final class InfosController extends AbstractController
@@ -23,17 +24,52 @@ final class InfosController extends AbstractController
     }
 
     #[Route('/new', name: 'app_infos_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository,
+    ): Response {
         $info = new Infos();
-        $form = $this->createForm(InfosType::class, $info);
+
+        $userId = $request->query->getInt('user');
+
+        if ($userId > 0) {
+            $user = $userRepository->find($userId);
+
+            if ($user !== null) {
+                if ($user->getInfos() !== null) {
+                    $this->addFlash(
+                        'error',
+                        'Cet utilisateur possède déjà des informations.'
+                    );
+
+                    return $this->redirectToRoute('app_user_show', [
+                        'id' => $user->getId(),
+                    ]);
+                }
+
+                $info->setUser($user);
+            }
+        }
+
+        $form = $this->createForm(InfosType::class, $info, [
+            'is_edit' => $info->getUser() !== null,
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($info);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_infos_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash(
+                'success',
+                'Les informations ont été ajoutées avec succès.'
+            );
+
+            return $this->redirectToRoute('app_user_show', [
+                'id' => $info->getUser()->getId(),
+            ]);
         }
 
         return $this->render('infos/new.html.twig', [
@@ -59,7 +95,14 @@ final class InfosController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_infos_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash(
+                'success',
+                'Les informations ont été modifiées avec succès.'
+            );
+
+            return $this->redirectToRoute('app_user_show', [
+                'id' => $info->getUser()->getId(),
+            ]);
         }
 
         return $this->render('infos/edit.html.twig', [
@@ -69,13 +112,28 @@ final class InfosController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_infos_delete', methods: ['POST'])]
-    public function delete(Request $request, Infos $info, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$info->getId(), $request->getPayload()->getString('_token'))) {
+    public function delete(
+        Request $request,
+        Infos $info,
+        EntityManagerInterface $entityManager,
+    ): Response {
+        $userId = $info->getUser()->getId();
+
+        if ($this->isCsrfTokenValid(
+            'delete'.$info->getId(),
+            $request->getPayload()->getString('_token')
+        )) {
             $entityManager->remove($info);
             $entityManager->flush();
+
+            $this->addFlash(
+                'success',
+                'Les informations ont été supprimées avec succès.'
+            );
         }
 
-        return $this->redirectToRoute('app_infos_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_user_show', [
+            'id' => $userId,
+        ]);
     }
 }

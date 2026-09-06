@@ -3,41 +3,105 @@
 {% block title %}Détail utilisateur{% endblock %}
 
 {% block body %}
-    <h1>Détail utilisateur</h1>
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Nom d’utilisateur</th>
-                <td>{{ user.username }}</td>
-            </tr>
-            <tr>
-                <th>Adresse e-mail</th>
-                <td>{{ user.email }}</td>
-            </tr>
-            <tr>
-                <th>Rôle</th>
-                <td>
-                    {% if 'ROLE_ADMIN' in user.roles %}
-                        Administrateur
-                    {% else %}
-                        Utilisateur
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <th>Informations</th>
-                <td>
-                    {% if user.infos %}
-                        Renseignées
-                    {% else %}
-                        Non renseignées
-                    {% endif %}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="page-header">
+        {{ include('_ariane.html.twig', { items: [
+            { label: 'Utilisateurs', url: path('app_user_index') },
+            { label: user.username,  url: null }
+        ]}) }}
 
-    <a href="{{ path('app_user_index') }}">Retour à la liste</a>
-    <a href="{{ path('app_user_edit', {'id': user.id}) }}">Modifier</a>
-    {{ include('user/_delete_form.html.twig') }}
+        <h1>{{ user.username }}</h1>
+        <p>Consultez et gérez le compte de cet utilisateur.</p>
+    </div>
+
+    <section class="card card-detail">
+        <div class="card-detail-header">
+            <h2>Compte utilisateur</h2>
+
+            <a
+                href="{{ path('app_user_edit', {'id': user.id}) }}"
+                class="btn btn-outline"
+            >
+                Modifier le compte
+            </a>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Nom d’utilisateur</span>
+            <span class="info-value">{{ user.username }}</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Adresse e-mail</span>
+            <span class="info-value">{{ user.email }}</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Rôle</span>
+            <span class="info-value">
+                {{ 'ROLE_ADMIN' in user.roles
+                    ? 'Administrateur'
+                    : 'Utilisateur'
+                }}
+            </span>
+        </div>
+
+        <div class="danger-zone">
+            {{ include('user/_delete_form.html.twig') }}
+        </div>
+    </section>
+
+    <section class="card card-detail">
+        <div class="card-detail-header">
+            <h2>Informations</h2>
+
+            {% if user.infos %}
+                <a
+                    href="{{ path('app_infos_edit', {'id': user.infos.id}) }}"
+                    class="btn btn-outline"
+                >
+                    Modifier les informations
+                </a>
+            {% else %}
+                <a
+                    href="{{ path('app_infos_new', {'user': user.id}) }}"
+                    class="btn btn-primary"
+                >
+                    Ajouter les informations
+                </a>
+            {% endif %}
+        </div>
+
+        {% if user.infos %}
+            <div class="info-row">
+                <span class="info-label">Rang</span>
+                <span class="info-value value-rank">
+                    {{ user.infos.rank }}
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Victoires</span>
+                <span class="info-value value-win">
+                    {{ user.infos.victoire }}
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Défaites</span>
+                <span class="info-value value-loss">
+                    {{ user.infos.defaite }}
+                </span>
+            </div>
+
+            <div class="danger-zone">
+                {{ include('infos/_delete_form.html.twig', {
+                    'info': user.infos
+                }) }}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p>Aucune information n’est encore renseignée pour cet utilisateur.</p>
+            </div>
+        {% endif %}
+    </section>
 {% endblock %}
